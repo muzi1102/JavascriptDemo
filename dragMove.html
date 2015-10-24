@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jquery的dragMove</title>
+<style >
+    body,div,ul,li{margin: 0; padding: 0;}
+    #div1{margin:10px auto;width:810px;}
+    #div1 li {
+    float: left;
+    width: 250px;
+    height: 250px;
+    margin: 10px;
+    list-style: none;
+    }
+    #div1 li img{
+    width: 250px;
+    height: 250px;
+    }
+    .active {border:1px dashed #000;}
+</style>
+
+<script>
+
+window.onload=function(){
+    var oDiv=document.getElementById('div1');
+    var aLi=document.getElementsByTagName('li');
+    var aPos=[];
+    var minZindex=1;
+    for (var i = 0; i<aLi.length; i++) {
+        aPos[i] = {left:aLi[i].offsetLeft, top:aLi[i].offsetTop};
+    };
+    for (var i = 0; i <aLi.length; i++) {
+        // console.log(aLi[i].length);
+        aLi[i].style.left=aPos[i].left+'px';
+        aLi[i].style.top=aPos[i].top+'px';
+        aLi[i].index=i;
+        aLi[i].style.position="absolute";
+        aLi[i].style.margin=0;
+        Drag(aLi[i]);
+    };
+    function Drag(obj){
+        obj.onmousedown=function(event){
+            var ev=event||window.event;
+            obj.style.zIndex=minZindex++;
+            var disX=ev.clientX-obj.offsetLeft;
+            var disY=ev.clientY-obj.offsetTop;
+            document.onmousemove=function(event){
+                var ev=event||window.event;
+                obj.style.left=ev.clientX-disX+'px';
+                obj.style.top=ev.clientY-disY+'px';
+                for(i = 0; i < aLi.length; i++){
+                  aLi[i].className = '';
+                }
+                var minNear=findNear(obj);
+                //返回的是index
+                if (minNear) {
+                    minNear.className="active";
+                }
+            }
+            document.onmouseup=function(){
+                document.onmousemove=null;
+                document.onmouseup=null;
+                var minNear=findNear(obj);
+                if (minNear) {
+                    minNear.className="";
+                    minNear.style.zIndex=minZindex++;
+                    obj.style.zIndex=minZindex++;
+                    startMove(minNear,aPos[obj.index]);
+                    startMove(obj,aPos[minNear.index]);
+                    var changeZindex=0;
+                    changeZindex=obj.index;
+                    obj.index=minNear.index;
+                    minNear.index=changeZindex;
+                }else{
+                    startMove(obj,aPos[obj.index]);
+                }
+            }
+            clearInterval(obj.timer);
+            return false;
+
+        }
+    }
+    function findNear(obj){
+        var minZindex=-1;
+        // var minDis=[];
+        // var minI=[];
+        var iMin = 9999;
+        for (var i = 0; i <aLi.length; i++) {
+            // if (aLi[i]==obj) {console.log("bra") ;continue};
+            if(obj == aLi[i]){continue;}
+            if (getCollide(aLi[i],obj)) {
+                var dis=getDis(aLi[i],obj);
+                if (iMin>dis) {
+                    iMin=dis;
+                    minZindex=i;
+                    // console.log(aLi[minZindex]);
+                }
+            }
+        };
+        if (iMin==-1) {
+            return null;
+            // return "false"
+        }else{
+            // console.log(aLi[minZindex])
+            return aLi[minZindex];
+            // return "true";
+        }
+    }
+    function getCollide(CollObj, byCollObj){
+        var CollObjTop = CollObj.offsetTop;
+        var CollObjRight = CollObj.offsetLeft + CollObj.offsetWidth;
+        var CollObjBottom = CollObj.offsetTop + CollObj.offsetHeight;
+        var CollObjLeft = CollObj.offsetLeft;
+
+        var byCollObjTop = byCollObj.offsetTop;
+        var byCollObjRight = byCollObj.offsetLeft + byCollObj.offsetWidth;
+        var byCollObjBottom = byCollObj.offsetTop + byCollObj.offsetHeight;
+        var byCollObjLeft = byCollObj.offsetLeft;
+
+    if(CollObjTop > byCollObjBottom || CollObjRight < byCollObjLeft || CollObjBottom < byCollObjTop || CollObjLeft > byCollObjRight){
+        return false;
+    }else{
+        return true;
+    }
+    }
+    // 2个左定点之间的距离
+    function getDis(obj1,obj2){
+        var x=obj1.offsetLeft-obj2.offsetLeft;
+        var y=obj1.offsetTop-obj2.offsetTop;
+        return Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+    }
+    function startMove(obj,json,fn){
+        var timer=null;
+        clearInterval(obj.timer);
+      obj.timer=setInterval(function (){
+      var bStop=true; //这一次运动就结束了——所有的值都到达了
+      for(var attr in json)
+      {
+      //1.取当前的值
+      var iCur=0;
+
+      if(attr=='opacity')
+      {
+      iCur=parseInt(parseFloat(getStyle(obj, attr))*100);
+      }
+      else
+      {
+      iCur=parseInt(getStyle(obj, attr));
+      }
+
+      //2.算速度
+      var iSpeed=(json[attr]-iCur)/8;
+      iSpeed=iSpeed>0?Math.ceil(iSpeed):Math.floor(iSpeed);
+
+      //3.检测停止
+      if(iCur!=json[attr])
+      {
+      bStop=false;
+      }
+
+      if(attr=='opacity')
+      {
+      obj.style.filter='alpha(opacity:'+(iCur+iSpeed)+')';
+      obj.style.opacity=(iCur+iSpeed)/100;
+      }
+      else
+      {
+      obj.style[attr]=iCur+iSpeed+'px';
+      }
+      }
+
+      if(bStop)
+      {
+      clearInterval(obj.timer);
+
+      if(fn)
+      {
+      fn();
+      }
+      }
+      }, 30)
+    };
+    function getStyle(obj, attr)
+    {
+        if(obj.currentStyle)
+    {
+            return obj.currentStyle[attr];
+    }
+        else
+    {
+            return getComputedStyle(obj, false)[attr];
+    }
+    }
+
+}
+</script>
+</head>
+<body>
+<div id="div1">
+    <ul>
+        <li><img src="images/360.png" /></li>
+        <li><img src="images/renren.png" /></li>
+        <li><img src="images/youku.png" /></li>
+        <li><img src="images/360game.png" /></li>
+        <li><img src="images/jd.png" /></li>
+        <li><img src="images/xinlan.png" /></li>
+        <li><img src="images/taobao.png" /></li>
+        <li><img src="images/wangyi.png" /></li>
+        <li><img src="images/souhu.png" /></li>
+    </ul>
+</div>
+</body>
+</html>
