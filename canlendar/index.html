@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>JavaScript Sample</title>
+    <style type="text/css">
+    div #dataTextContainer {
+        border: 1px #A5ACB2 solid;
+        width: 100px;
+        height: 19px;
+        text-align: right;
+        float: left;
+    }
+    
+    div #dataTextContainer input {
+        border-width: 0px;
+        border-style: none;
+        border-color: transparent;
+        width: 68px;
+        height: 14px;
+        font-size: 12px;
+        text-align: left;
+    }
+    
+    div #dataTextContainer button {
+        width: 22px;
+        height: 19px;
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+    
+    div #calendarContainer {
+        width: 200px;
+        height: 100px;
+        z-index: 10000;
+        font-size: 13px;
+    }
+    </style>
+    <!-- // <script type="text/javascript" src="inputDate.js"></script> -->
+</head>
+
+<body>
+    <div id="dataTextContainer">
+        <input name="dataText" id="dateText" type="text" onfocus="javascript:getCurrentDay();" />
+        <button onclick="javascript:displayCalendar();">
+            <img src="rili.jpg" width="15" height="12">
+        </button>
+    </div>
+    <div id="calendarContainer">
+        <div class="week">
+            <span>日</span>
+            <span>一</span>
+            <span>二</span>
+            <span>三</span>
+            <span>四</span>
+            <span>五</span>
+            <span>六</span>
+        </div>
+    </div>
+</body>
+<script>
+function getCurrentDay() {
+    var newDate = new Date;
+    var odate = document.getElementById("dateText");
+    var date_year = newDate.getFullYear();
+    var date_month = newDate.getMonth() + 1;
+    var date_today = newDate.getDate();
+    odate.value = date_year + "-" + date_month + "-" + date_today;
+}
+
+function displayCalendar() {
+    drawCalendar();
+}
+function drawCalendar(sYear, sMonth) {
+    var newDate;
+    // console.log(sYear);
+    //是否传入数值
+    if (arguments[0] == null || arguments[1] == null) {
+        newDate = new Date();
+    } else {
+        newDate = new Date(sYear, sMonth - 1);
+    }
+
+    var date_year = newDate.getFullYear();
+    var date_month = newDate.getMonth() + 1;
+    var date_today = newDate.getDate();
+    // 今天星期几
+    var date_day = newDate.getDay();
+
+    var nextMonth = date_month + 1;
+    var nextYear = date_year;
+    var prevMonth = date_month - 1;
+    var prevYear = date_year;
+
+    if (sMonth == 12) {
+        nextMonth = 1;
+        nextYear = date_year + 1;
+    }
+    if (sMonth == 1) {
+        prevMonth = 12;
+        prevYear = date_year - 1;
+    }
+
+    var calendarTable = "";
+    calendarTable += '<table width="200" border="0" cellpadding="0" cellspacing="0" style="background-color:#0066FF;text-align:center;">';
+    calendarTable += ' <tr style="background-color:#339999;">';
+    //向前翻年
+    calendarTable += '<td colspan="2" onclick="javascript:drawCalendar(' + (prevYear - 1) + ',' + date_month + ');"' +
+        ' style="cursor:pointer;background-color:#FF6600;"><<<</td>';
+    //向前翻月
+    calendarTable += '<td colspan="2" onclick="javascript:drawCalendar(' + prevYear + ',' + prevMonth + ');"' +
+        ' style="cursor:pointer;background-color:#FF6600;"><<</td>';
+    //向后翻月
+    calendarTable += '<td colspan="2" onclick="javascript:drawCalendar(' + nextYear + ',' + nextMonth + ');"' +
+        ' style="cursor:pointer;background-color:#FF6600;">>></td>';
+    //向后翻年
+    calendarTable += '<td colspan="1" onclick="javascript:drawCalendar(' + (nextYear + 1) + ',' + date_month + ');"' +
+        ' style="cursor:pointer;background-color:#FF6600;">>>></td>';
+    calendarTable += ' </tr>';
+
+    //星期表头
+    calendarTable += '  <tr style="background-color:#6699FF;">';
+    calendarTable += '      <td>日</td>';
+    calendarTable += '      <td>一</td>';
+    calendarTable += '      <td>二</td>';
+    calendarTable += '      <td>三</td>';
+    calendarTable += '      <td>四</td>';
+    calendarTable += '      <td>五</td>';
+    calendarTable += '      <td>六</td>';
+    calendarTable += '  </tr>';
+
+    //计算一个月内的天数,注意闰月
+    var dayNum_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    var isleapyear = date_year % 4;
+    if (isleapyear == 0) {
+        dayNum_in_month[1] = 29;
+    }
+    var month_alldays = dayNum_in_month[date_month - 1];
+
+    //计算行数，line_top表示当前日期上面的行数，包括当前行；line_bot表示当前日期下面的行数，不包括当前行
+    var line_top;
+    var line_bot;
+    if ((date_today - date_day + 1) % 7 != 0) {
+        line_top = Math.floor((date_today - date_day + 1) / 7) + 1;
+    } else {
+        line_top = Math.floor((date_today - date_day + 1) / 7);
+    }
+
+    if ((30 - date_today + date_day + 1) % 7 != 0) {
+        line_bot = Math.floor((30 - date_today + date_day + 1) / 7) + 1;
+    } else {
+        line_bot = Math.floor((30 - date_today + date_day + 1) / 7);
+    }
+
+    //定义一个二维数组，预备一个6*7的数组，数组中每个元素对应一个单元格(日期)
+    var dateList = new Array([""], [""], [""], [""], [""], [""], [""]);
+    var dateCell;
+
+    for (var i = 1; i < 7; i++) {
+        //i是行数
+        calendarTable += '  <tr>';
+        for (var j = 0; j < 7; j++) {
+            //j是列数
+            dateList[i][j] = date_today - 7 * (line_top - i + 1) + j - date_day;
+            //如果武器<=0，置空
+            if ((date_today - 7 * (line_top - i + 1) + j - date_day) <= 0) {
+                dateList[i][j] = " ";
+            }
+            //如果日期大于月总天数，则不显示
+            if ((date_today - 7 * (line_top - i + 1) + j - date_day) > month_alldays) {
+                dateList[i][j] = " ";
+            }
+
+            if (dateList[i][j] != " ") {
+                //如果单元格不是空，那么可以设置其触发三个事件，共有三个事件
+                //1、单击事件，将当前日期写入文本框
+                //2、鼠标指针移到单元格上，改变背景
+                //3、鼠标指针离开单元格，背景复原
+                dateCell =
+                    '<td onclick="javascript:setDateText(' + date_year + ',' + date_month + ',this.firstChild.nodeValue);"' + 'onmouseover="javascript:setFocus(this);"' + '  onmouseout="javascript:setFocusOut(this);"' + '  style="cursor:pointer;">' + dateList[i][j] + '</td>';
+
+                if (i == line_top && j == line_bot) {
+                    dateCell =
+                        '<td onclick="javascript:setDateText(' + date_year + ',' + date_month + ',this.firstChild.nodeValue);"' + 'onmouseover="javascript:setFocus(this);"' + '  onmouseout="javascript:setFocusOut(this);"' + '  style="cursor:pointer;background-color:#FF6600;">' + dateList[i][j] + '</td>';
+                }
+
+            } else {
+                dateCell = "<td> </td>";
+            }
+            calendarTable += dateCell;
+        }
+        calendarTable += '</tr>';
+    }
+    calendarTable += '<tr><td colspan="7"' + 'onclick="javascript:closeCalendar();"' + 'style="background-color#339999;cursor:pointer;color:red;font-weight:bold">' + '关闭(' + date_year + "年" + date_month + "月" + ')</td></tr>';
+    calendarTable += '</table>';
+
+    //将日期写入
+    var oCalendarContainer = document.getElementById("calendarContainer");
+    oCalendarContainer.innerHTML = calendarTable;
+}
+function closeCalendar() {
+    var oCalendarContainer = document.getElementById("calendarContainer");
+    oCalendarContainer.innerHTML = "";
+}
+//当鼠标指针指到当前日期单元格
+function setFocus(obj) {
+    obj.style.backgroundColor = "#FF6600";
+}
+//当鼠标指针离开当前日期单元格
+function setFocusOut(obj) {
+    obj.style.backgroundColor = "";
+}
+//鼠标单击当前单元格
+function setDateText(sYear, sMonth, sDate) {
+    var oDateText = document.getElementById("dateText");
+    oDateText.value = sYear + "-" + sMonth + "-" + sDate;
+}
+</script>
+
+</html>
