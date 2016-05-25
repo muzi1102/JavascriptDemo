@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<body>
+    <script>
+    function Stack() {
+        this._size = 0;
+        this._storage = {}
+    }
+    Stack.prototype.push = function(data) {
+        var size = this._size++;
+        this._storage[size] = data
+    }
+    Stack.prototype.pop = function() {
+    	// 弹出元素，先进后出
+    	var size=this._size,
+    		deleteData;
+    	// 取出元素
+    	deleteData=this._storage[size-1];
+    	//删除元素
+    	delete this._storage[size-1]
+    	this._size--;
+    	return deleteData;
+    }
+   	// queue ，先来先服务
+   	function Queue() {
+   		this._oldestIndex=1;
+   		this._newestIndex=1;
+   		this._storage={};
+   	}
+   	Queue.prototype.size=function(){
+   		return this._newestIndex-this._oldestIndex;
+   	}
+   	Queue.prototype.enqueue=function(data){
+   		this._storage[this._newestIndex]=data;
+   		this._newestIndex++;
+   	}
+   	Queue.prototype.dequeue=function(){
+   		var oldestIndex = this._oldestIndex,
+   			newestIndex=this._newestIndex,
+   			deleteData;
+   		if (oldestIndex!==newestIndex) {
+   			deleteData=this._storage[oldestIndex];
+   			delete this._storage[oldestIndex];
+   			this._oldestIndex++;
+   			return deleteData;
+   		}
+   	}
+   	var queue=new Queue;
+   		queue.enqueue(12);
+   		queue.enqueue([1,2,3]);
+   		queue.enqueue('b');
+   	console.log(queue._storage);
+   	queue.dequeue();
+   	console.log(queue._storage);
+    </script>
+</body>
+
+</html>
