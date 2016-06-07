@@ -1,0 +1,78 @@
+*{margin: 0;padding: 0;overflow: hidden;}
+.header{
+    width: 980px;
+    height:100px;
+    line-height: 100px;
+    text-align: center;
+    margin: 0 auto;
+    font-family: cursive;
+    font-size: 30px;
+    font-weight: bold;
+    background-color: red;
+}
+.playSong{
+    width: 980px;
+    margin: 0 auto;
+    border: 1px solid #000;
+    position: relative;
+}
+#playList{
+    width: 250px;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    border: 1px solid red;
+    height: 500px;
+
+}
+#playList h3{
+    font-family: cursive;
+    color: blue
+}
+#playList ol{
+    margin-left: 10px;
+}
+#playList ol li{
+    line-height: 30px;
+    height: 30px;
+}
+#playList ol li a{
+    text-decoration: none;
+}
+.box{
+    border: 1px solid #000;
+    width: 600px;
+    height: 600px;
+    position: relative;
+    left: 280px;
+    overflow: hidden;
+}
+.container{
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    opacity:0.3;
+}
+.container:hover{
+    opacity:1;
+}
+#lrc{
+    width: 300px;
+    margin: 0 auto;
+    position: relative;
+
+}
+.line{
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+}
+.current-line{
+    color: red;
+}
+.currentSong{
+    background-color: yellow;
+}
+.currentSong a{
+    color: red;
+}

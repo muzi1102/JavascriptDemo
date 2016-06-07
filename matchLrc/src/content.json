@@ -1,0 +1,23 @@
+{
+    "data": [{
+        "songName": "春风十里",
+        "singer": "鹿先生乐队",
+        "lrcName": "chunfeng"
+    }, {
+        "songName": "人前人后",
+        "singer": "庄心妍",
+        "lrcName": "renqianrenhou"
+    }, {
+        "songName": "一个人",
+        "singer": "韩红队",
+        "lrcName": "yigeren"
+    }, {
+        "songName": "易燃易爆炸",
+        "singer": "陈粒",
+        "lrcName": "yiranyibaozha"
+    }, {
+        "songName": "我的天空",
+        "singer": "南征北战",
+        "lrcName": "wodetiankong"
+    }]
+}
